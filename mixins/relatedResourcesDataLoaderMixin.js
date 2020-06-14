@@ -70,6 +70,7 @@ export default {
             relatedResourcesDataTemp[resourceKey].data = response.data.data
             this.relatedResourcesData = Object.assign({}, relatedResourcesDataTemp)
             allDataLoaded = response.data.meta.current_page >= response.data.meta.last_page
+            axiosConfig.params.page++
           })
           .catch((error) => {
             // eslint-disable-next-line no-console
