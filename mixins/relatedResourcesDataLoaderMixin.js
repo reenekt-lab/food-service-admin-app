@@ -20,7 +20,7 @@ export default {
         }
       }
     },
-    loadRelatedResourceData (relatedResource, resourceKey) {
+    async loadRelatedResourceData (relatedResource, resourceKey) {
       // prepare relatedResourcesData
       if (!this.relatedResourcesData[resourceKey]) {
         const relatedResourcesDataTemp = this.relatedResourcesData
@@ -37,7 +37,9 @@ export default {
       }
 
       const axiosConfig = {
-        params: {}
+        params: {
+          page: 1
+        }
       }
 
       // add request additional params
@@ -58,19 +60,25 @@ export default {
       }
 
       // send request and receive data
-      this.$axios.get(relatedResource.apiPath, axiosConfig)
-        .then((response) => {
-          const relatedResourcesDataTemp = this.relatedResourcesData
-          relatedResourcesDataTemp[resourceKey].loading = false
-          relatedResourcesDataTemp[resourceKey].data = response.data.data
-          this.relatedResourcesData = Object.assign({}, relatedResourcesDataTemp)
-        })
-        .catch((error) => {
-          // eslint-disable-next-line no-console
-          console.error('Error on loading resource data')
-          // eslint-disable-next-line no-console
-          console.error(error.response)
-        })
+      let allDataLoaded = false
+      let loadsCount = 0
+      do {
+        await this.$axios.get(relatedResource.apiPath, axiosConfig)
+          .then((response) => {
+            const relatedResourcesDataTemp = this.relatedResourcesData
+            relatedResourcesDataTemp[resourceKey].loading = false
+            relatedResourcesDataTemp[resourceKey].data = response.data.data
+            this.relatedResourcesData = Object.assign({}, relatedResourcesDataTemp)
+            allDataLoaded = response.data.meta.current_page >= response.data.meta.last_page
+          })
+          .catch((error) => {
+            // eslint-disable-next-line no-console
+            console.error('Error on loading resource data')
+            // eslint-disable-next-line no-console
+            console.error(error.response)
+          })
+        loadsCount++
+      } while (!allDataLoaded && loadsCount < 20)
     }
   }
 }
