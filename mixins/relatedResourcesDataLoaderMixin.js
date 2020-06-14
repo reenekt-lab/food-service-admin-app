@@ -67,7 +67,7 @@ export default {
           .then((response) => {
             const relatedResourcesDataTemp = this.relatedResourcesData
             relatedResourcesDataTemp[resourceKey].loading = false
-            relatedResourcesDataTemp[resourceKey].data = response.data.data
+            relatedResourcesDataTemp[resourceKey].data = relatedResourcesDataTemp[resourceKey].data.concat(response.data.data)
             this.relatedResourcesData = Object.assign({}, relatedResourcesDataTemp)
             allDataLoaded = response.data.meta.current_page >= response.data.meta.last_page
             axiosConfig.params.page++
