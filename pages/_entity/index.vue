@@ -206,7 +206,11 @@ export default {
     loadPageData (page = 1) {
       this.loading = true
 
-      this.$axios.get(this.apiEndpoint)
+      this.$axios.get(this.apiEndpoint, {
+        params: {
+          page
+        }
+      })
         .then((response) => {
           this.entities = response.data
         })
